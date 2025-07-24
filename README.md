@@ -70,10 +70,10 @@ Returns all transactions for the specified account.
    docker-compose up --build
    ```
 
-2. The API will be available at `http://localhost:5000`
+2. The API will be available at `http://localhost:54058`
 
 ### Running Locally
 
 1. Open the solution in Visual Studio or JetBrains Rider
 2. Run the LedgerAPI project
-3. The API will be available at `http://localhost:5000`
+3. The API will be available at `http://localhost:54058`
