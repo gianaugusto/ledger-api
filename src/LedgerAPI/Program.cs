@@ -1,4 +1,5 @@
 using LedgerAPI.Models;
+using LedgerAPI.Repositories;
 using LedgerAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSingleton<ILedgerRepository, LedgerRepository>();
 builder.Services.AddSingleton<LedgerService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
