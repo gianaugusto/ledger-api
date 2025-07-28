@@ -43,9 +43,9 @@ ledger-api/
 Request body:
 ```json
 {
-  "type": "deposit" | "withdrawal",
-  "amount": decimal,
-  "description": string (optional)
+  "type": "deposit = 0 or withdrawal = 1",
+  "amount": "decimal",
+  "description": "string (optional)"
 }
 ```
 
