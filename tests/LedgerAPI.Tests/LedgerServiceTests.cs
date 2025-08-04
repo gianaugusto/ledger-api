@@ -5,6 +5,7 @@ using LedgerAPI.Models;
 using LedgerAPI.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LedgerAPI.Tests
 {
@@ -17,6 +18,78 @@ public class LedgerServiceTests
     {
         _repositoryMock = new Mock<ILedgerRepository>();
         _ledgerService = new LedgerService(_repositoryMock.Object);
+    }
+
+    [Fact]
+    public void GetBalance_ShouldReturnCorrectBalance_WithDateRange()
+    {
+        // Arrange
+        var accountId = "account1";
+        var startDate = DateTime.UtcNow.AddDays(-7);
+        var endDate = DateTime.UtcNow;
+
+        var transaction1 = new Transaction
+        {
+            Type = TransactionType.Deposit,
+            Amount = 100,
+            Description = "Test deposit 1",
+            Timestamp = startDate.AddDays(1)
+        };
+        var transaction2 = new Transaction
+        {
+            Type = TransactionType.Deposit,
+            Amount = 200,
+            Description = "Test deposit 2",
+            Timestamp = startDate.AddDays(3)
+        };
+        var transaction3 = new Transaction
+        {
+            Type = TransactionType.Withdrawal,
+            Amount = 50,
+            Description = "Test withdrawal",
+            Timestamp = startDate.AddDays(-1) // Outside the date range
+        };
+
+        var transactions = new List<Transaction> { transaction1, transaction2, transaction3 };
+        _repositoryMock.Setup(r => r.GetBalance(accountId, startDate, endDate)).Returns(transactions
+            .Where(t => t.Timestamp >= startDate && t.Timestamp <= endDate)
+            .Sum(t => t.Type == TransactionType.Deposit ? t.Amount : -t.Amount));
+
+        // Act
+        var balance = _ledgerService.GetBalance(accountId, startDate, endDate);
+
+        // Assert
+        Assert.Equal(300, balance); // 100 + 200 (transaction3 is outside the date range)
+        _repositoryMock.Verify(r => r.GetBalance(accountId, startDate, endDate), Times.Once);
+    }
+
+    [Fact]
+    public void GetBalance_ShouldReturnZero_WithDateRange_WhenNoTransactionsInRange()
+    {
+        // Arrange
+        var accountId = "account1";
+        var startDate = DateTime.UtcNow.AddDays(-7);
+        var endDate = DateTime.UtcNow;
+
+        var transaction1 = new Transaction
+        {
+            Type = TransactionType.Deposit,
+            Amount = 100,
+            Description = "Test deposit 1",
+            Timestamp = startDate.AddDays(-1) // Outside the date range
+        };
+
+        var transactions = new List<Transaction> { transaction1 };
+        _repositoryMock.Setup(r => r.GetBalance(accountId, startDate, endDate)).Returns(transactions
+            .Where(t => t.Timestamp >= startDate && t.Timestamp <= endDate)
+            .Sum(t => t.Type == TransactionType.Deposit ? t.Amount : -t.Amount));
+
+        // Act
+        var balance = _ledgerService.GetBalance(accountId, startDate, endDate);
+
+        // Assert
+        Assert.Equal(0, balance);
+        _repositoryMock.Verify(r => r.GetBalance(accountId, startDate, endDate), Times.Once);
     }
 
         [Fact]
