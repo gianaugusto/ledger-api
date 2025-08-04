@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<ILedgerRepository, LedgerRepository>();
@@ -35,12 +36,13 @@ app.MapPost("/v1/accounts/{accountId}/transactions", (string accountId, Transact
 })
 .WithName("AddTransactionV1");
 
-app.MapGet("/v1/accounts/{accountId}/balance", (string accountId, LedgerService ledgerService) =>
+
+app.MapGet("/v1/accounts/{accountId}/balance", (string accountId, DateTime statDate, DateTime endDate, LedgerService ledgerService) =>
 {
-    var balance = ledgerService.GetBalance(accountId);
+    var balance = ledgerService.GetBalance(accountId, statDate, endDate);
     return Results.Ok(balance);
 })
-.WithName("GetBalanceV1");
+.WithName("GetBalanceByTimeV1");
 
 app.MapGet("/v1/accounts/{accountId}/transactions", (string accountId, LedgerService ledgerService) =>
 {

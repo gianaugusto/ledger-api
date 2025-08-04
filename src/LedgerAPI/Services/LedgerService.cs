@@ -1,6 +1,7 @@
 using LedgerAPI.Models;
 using LedgerAPI.Repositories;
 using System.Collections.Generic;
+using System;
 
 namespace LedgerAPI.Services
 {
@@ -21,6 +22,11 @@ namespace LedgerAPI.Services
         public decimal GetBalance(string accountId)
         {
             return _repository.GetBalance(accountId);
+        }
+
+        public decimal GetBalance(string accountId, DateTime statDate, DateTime endDate)
+        {
+            return _repository.GetBalance(accountId, statDate, endDate);
         }
 
         public List<Transaction> GetTransactions(string accountId)

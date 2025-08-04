@@ -1,3 +1,5 @@
+using System;
+
 namespace LedgerAPI.Models
 {
     public enum TransactionType
@@ -8,8 +10,14 @@ namespace LedgerAPI.Models
 
     public class Transaction
     {
+
         public required TransactionType Type { get; set; }
         public decimal Amount { get; set; }
         public required string Description { get; set; }
+        public required DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    }
+
+    public class TransactionA : Transaction{
+
     }
 }
